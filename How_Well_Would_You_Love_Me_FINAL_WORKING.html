@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How Well Would You Love Me?</title>
+<style>
+:root{--bg:#f7f3f0;--card:#fffdfa;--text:#302b2b;--muted:#786f6c;--accent:#8f6670;--accent2:#c9aeb3;--line:#e5dcda;--good:#627b68;--bad:#8b6464}
+*{box-sizing:border-box} body{margin:0;background:linear-gradient(145deg,#f8f4f1,#eee5e1);color:var(--text);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.55}
+.wrap{max-width:850px;margin:0 auto;padding:28px 18px 60px}.hero{text-align:center;padding:48px 20px 28px}.eyebrow{letter-spacing:.18em;text-transform:uppercase;color:var(--accent);font-size:.72rem;font-weight:700}.hero h1{font-family:Georgia,serif;font-size:clamp(2.3rem,7vw,4.4rem);font-weight:500;line-height:1.05;margin:12px 0}.hero p{max-width:620px;margin:0 auto;color:var(--muted);font-size:1.05rem}
+.card{background:rgba(255,253,250,.92);border:1px solid var(--line);border-radius:22px;padding:28px;margin:18px 0;box-shadow:0 12px 35px rgba(75,55,55,.06)}
+.section{display:none}.section.active{display:block}.section h2{font-family:Georgia,serif;font-size:2rem;margin:0 0 8px}.section .intro{color:var(--muted);margin-top:0}.field label,.q label{font-weight:650;display:block;margin-bottom:10px}.text{width:100%;padding:14px 15px;border:1px solid var(--line);border-radius:12px;background:#fff;font-size:1rem}
+.progressbox{position:sticky;top:0;z-index:4;background:rgba(247,243,240,.93);backdrop-filter:blur(10px);padding:12px 0}.progressrow{display:flex;justify-content:space-between;color:var(--muted);font-size:.84rem}.bar{height:7px;background:#e8dfdc;border-radius:99px;overflow:hidden;margin-top:7px}.fill{height:100%;background:var(--accent);width:0;transition:.25s}
+.q{padding:20px 0;border-top:1px solid var(--line)}.q:first-of-type{border-top:0}.qtext{font-size:1.02rem;margin:0 0 13px;font-weight:600}.options{display:grid;gap:8px}.opt{border:1px solid var(--line);border-radius:13px;padding:11px 13px;cursor:pointer;background:#fff;transition:.15s}.opt:hover{border-color:var(--accent2);transform:translateY(-1px)}.opt.selected{border-color:var(--accent);background:#f4eaec}.opt input{margin-right:9px;accent-color:var(--accent)}
+.scenario .opt{padding:14px}.scenario .opt strong{display:block;margin-bottom:3px}
+.actions{display:flex;justify-content:space-between;gap:12px;margin-top:24px}.btn{border:0;border-radius:12px;padding:13px 20px;font-weight:700;font-size:.95rem;cursor:pointer}.primary{background:var(--accent);color:white}.secondary{background:#eee7e4;color:var(--text)}.btn:disabled{opacity:.45;cursor:not-allowed}
+.error{color:#9a4e4e;background:#f7e9e9;border:1px solid #e7caca;padding:11px 13px;border-radius:11px;margin-top:14px;display:none}
+.results{text-align:center}.score{font-family:Georgia,serif;font-size:5rem;line-height:1;margin:10px 0;color:var(--accent)}.resultTitle{font-size:1.45rem;font-weight:800}.resultText{max-width:650px;margin:10px auto;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:25px}.cat{text-align:left;border:1px solid var(--line);border-radius:15px;padding:14px;background:#fff}.cathead{display:flex;justify-content:space-between;font-weight:700}.mini{height:6px;background:#ece5e2;border-radius:99px;margin-top:9px;overflow:hidden}.mini span{display:block;height:100%;background:var(--accent)}
+.columns{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:24px}.columns .card{margin:0}.columns h3{margin-top:0}
+.small{font-size:.83rem;color:var(--muted)}.privacy{font-size:.78rem;color:var(--muted);text-align:center;margin-top:20px}
+@media(max-width:650px){.card{padding:20px;border-radius:17px}.grid,.columns{grid-template-columns:1fr}.hero{padding-top:25px}.score{font-size:4rem}.actions{flex-direction:column-reverse}.btn{width:100%}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <div class="eyebrow">Relationship Compatibility Assessment</div>
+    <h1>How Well Would You Love Me?</h1>
+    <p>This isn't a test of whether you're a good person. It's a look at how naturally the way you love, communicate and show up matches what I need in a relationship.</p>
+  </div>
+
+  <div class="progressbox">
+    <div class="progressrow"><span id="progressLabel">Getting started</span><span id="progressPct">0%</span></div>
+    <div class="bar"><div class="fill" id="fill"></div></div>
+  </div>
+
+  <form id="quiz">
+    <section class="section active" data-section="0">
+      <div class="card">
+        <h2>Before we start</h2>
+        <p class="intro">There are no perfect answers. Be honest rather than choosing what you think sounds best.</p>
+        <div class="field"><label for="name">What should I call you?</label><input class="text" id="name" required placeholder="Your name or nickname"></div>
+      </div>
+      <div class="actions"><span></span><button class="btn primary" type="button" onclick="startTest()">Start the test</button></div>
+    </section>
+  </form>
+
+  <div id="submitStatus" class="privacy" style="display:none"></div>
+  <div id="results" class="section">
+    <div class="card results">
+      <div class="eyebrow">Your result</div>
+      <h2>Compatibility</h2>
+      <div class="score" id="overall">—</div>
+      <div class="resultTitle" id="resultTitle"></div>
+      <p class="resultText" id="resultText"></p>
+      <div class="grid" id="categories"></div>
+    </div>
+    <div class="columns">
+      <div class="card"><h3>✨ Strongest areas</h3><div id="strongest"></div></div>
+      <div class="card"><h3>💭 Areas to understand</h3><div id="lowest"></div></div>
+    </div>
+    <div class="card small">This score isn't a verdict on whether two people can love each other. It's a snapshot of how naturally your relationship style seems to fit what I need. The most important part isn't getting a perfect score — it's being willing to understand each other, communicate honestly, compromise, and keep choosing each other.</div>
+  </div>
+</div>
+
+<script>
+const cats=[
+["Being Seen",["I naturally notice when someone I care about becomes quieter or withdraws.","If I notice someone pulling away, I try to understand what is happening rather than simply ignoring it.","I pay attention to small changes in the person I love.","I remember little things they tell me and bring them up later.","I can tell when someone is struggling even when they don't directly say it.","I notice when someone seems overwhelmed and try to make things a little easier for them."]],
+["Understanding",["I genuinely want to understand how my partner's mind works.","When my partner reacts differently than I would, I try to understand their perspective before judging it.","I am willing to learn how my partner needs to be loved instead of expecting them to simply adapt to me.","I don't assume that I already know what my partner means or feels.","If I don't understand something important to my partner, I try to learn rather than dismiss it.","I don't expect my partner to teach me everything perfectly, but I genuinely want to learn how to love them better."]],
+["Communication",["I communicate when something is bothering me instead of letting resentment build.","I listen to understand rather than simply waiting for my turn to speak.","I can talk about difficult feelings without immediately becoming defensive.","I am willing to have uncomfortable conversations when they are important to the relationship.","I try to make sure my partner feels heard, even when I disagree.","I am willing to keep communicating when we misunderstand each other."]],
+["Effort",["I believe relationships require active effort from both people.","I notice when my partner is putting effort into the relationship.","I naturally want to do small things that make my partner happy.","I don't expect one person to carry the emotional or practical workload of the relationship.","I am willing to put effort into understanding things that don't come naturally to me.","I show my partner that they matter through actions, not just words."]],
+["Consistency",["I am consistent in how I treat someone I love.","I don't disappear emotionally when things become difficult.","I follow through when I say I'll do something.","I understand why reliability matters in a relationship.","I make communication a regular part of my relationship.","I believe small consistent actions can mean more than occasional grand gestures."]],
+["Affection & Reassurance",["I naturally express affection toward my partner.","I understand that reassurance can be important even when I personally don't need much of it.","I enjoy giving affectionate messages or gestures without needing to be asked.","I am comfortable showing my partner that I want them.","I understand that affection and reassurance can make someone feel emotionally safe.","I don't make my partner feel needy for wanting reassurance or affection."]],
+["Boundaries & Safety",["I respect my partner's boundaries even when I don't personally understand them.","I want my partner to feel safe telling me when something makes them uncomfortable.","I don't intentionally push boundaries to see how far I can go.","I can disagree with a boundary without punishing my partner for having it.","I want my partner to feel safe being completely honest with me.","I don't make my partner feel guilty for expressing their needs."]],
+["Space & Closeness",["I understand that someone can need space without loving me less.","I can give my partner space without emotionally abandoning them.","I believe healthy relationships can have both independence and closeness.","I want my partner to feel free to be themselves within the relationship.","I can stay emotionally present even when my partner needs time alone.","I don't see closeness and independence as opposites."]],
+["Partnership & Repair",["I see relationship problems as something both partners should work through together.","I am willing to compromise on important things.","I don't expect my partner to always be the one adapting.","After conflict, I care about repairing the relationship rather than simply winning the argument.","I can admit when I have contributed to a problem.","I believe both people should feel like equal partners."]],
+["Emotional Presence",["I stay emotionally present when my partner is struggling.","I don't become frightened or abandon my partner simply because they are experiencing intense emotions.","I can remain calm when someone I love is overwhelmed.","I understand that anger can sometimes come from frustration, hurt, or feeling misunderstood.","I want my partner to know that they don't have to handle everything alone.","I care about what is happening underneath someone's behavior, not just the behavior itself."]]]
+
+const scenarios=[
+["You notice that your partner has become unusually quiet and withdrawn during the evening. What are you most likely to do?",["Give them complete space and wait for them to approach me.","Ask once if they're okay, then leave it alone.","Check in gently and let them know I'm there if they want to talk.","Pay attention to their behavior and try to figure out what they might need.","Stay nearby, check in again later, and actively try to make sure they're okay without forcing them to talk."]],
+["Your partner reacts strongly to something that you personally wouldn't find upsetting. What do you do?",["Tell them they're overreacting.","Explain why I wouldn't react that way.","Ask them why it affected them so much.","Listen and try to understand what the situation means to them.","Listen, ask questions, remember what I learn, and use that understanding in the future."]],
+["Your partner tells you that something you did hurt them, but you didn't intend to hurt them.",["Explain that I didn't mean it that way and leave it there.","Defend myself if I feel misunderstood.","Listen and explain my intentions.","Listen, acknowledge how it affected them, and discuss it.","Listen without becoming defensive, acknowledge their feelings, explain my intentions, and work together on what we can do differently next time."]],
+["You notice your partner has had a difficult week and seems exhausted.",["Assume they'll tell me if they need something.","Ask whether they need anything.","Do something small to make their day easier.","Think about what would genuinely help them and do it.","Notice what they need, take something off their plate, check in emotionally, and continue showing up until things feel lighter."]],
+["You've had a busy day and haven't spoken much to your partner.",["Wait until tomorrow.","Send a quick message if I remember.","Let them know I'm busy but thinking about them.","Make time to check in properly when I can.","Even when life is busy, I make sure they know they haven't been forgotten."]],
+["Your partner seems insecure and needs reassurance from you.",["Tell them they need to trust me.","Reassure them once but become frustrated if they ask again.","Give them some reassurance.","Reassure them and ask what is making them feel insecure.","Reassure them with patience, affection, and genuine communication rather than making them feel guilty for needing reassurance."]],
+["Your partner tells you that something you're doing makes them uncomfortable.",["Tell them they're being unreasonable.","Explain why they shouldn't feel that way.","Stop for the moment and discuss it.","Listen carefully and try to understand why it bothers them.","Respect the boundary, listen without guilt-tripping them, and work together to find a solution that protects both people's needs."]],
+["Your partner shuts down and needs some time alone.",["Leave them completely alone until they come back.","Give them space and assume everything is fine.","Give them space while letting them know I'm still there.","Respect their space while checking in gently later.","Give them the space they need while making it clear that I'm not going anywhere and will be there when they're ready."]],
+["You and your partner strongly disagree about something important.",["Whoever feels more strongly should get their way.","We should agree to disagree and move on.","I explain my side and listen to theirs.","We discuss possible compromises.","We both explain our needs, look for a solution that respects both people, and are willing to adjust our own behavior too."]],
+["Your partner becomes overwhelmed and shuts down emotionally.",["Give them space and move on with my day.","Wait for them to become themselves again.","Ask if they need anything.","Stay available and remind them that I'm there.","Stay calm, remain present without forcing them to talk, make sure they are safe, and remind them that they don't have to face the difficult moment alone."]]
+];
+
+const scale=["Not me at all","Rarely me","Sometimes / depends","Mostly me","Very much me"];
+const form=document.getElementById("quiz");
+let current=0,totalSections=11,answers={};
+function addSection(i){
+ const s=document.createElement("section"); s.className="section"; s.dataset.section=i;
+ const [title,qs]=cats[i]; s.innerHTML=`<div class="card"><h2>${title}</h2><p class="intro">How much does this describe you?</p>${qs.map((q,j)=>questionHTML(`c${i}_${j}`,q,false)).join("")}${questionHTML(`s${i}`,scenarios[i][0],true)}</div><div class="actions"><button class="btn secondary" type="button" onclick="previousSection()">Back</button><button class="btn primary" type="button" onclick="nextSection()">${i===9?"See my result":"Next"}</button></div>`;
+ form.appendChild(s);
+}
+function questionHTML(id,text,scenario){
+ const opts=scenario?scenarios[Number(id.slice(1))][1]:scale;
+ return `<div class="q ${scenario?"scenario":""}"><p class="qtext">${text}</p><div class="options">${opts.map((o,k)=>`<label class="opt"><input type="radio" name="${id}" value="${k+1}" required><span>${scenario?`<strong>${String.fromCharCode(65+k)}</strong>`:""}${o}</span></label>`).join("")}</div></div>`;
+}
+cats.forEach((_,i)=>addSection(i));
+function addFinal(){
+ const s=document.createElement("section");s.className="section";s.dataset.section=11;
+ s.innerHTML=`<div class="card"><h2>One last thing</h2><p class="intro">These help add context to the result.</p>${questionHTML("f0","How important is emotional consistency to you in a relationship?",false)}${questionHTML("f1","How important is it to you that your partner actively learns how to love you in the way you need?",false)}</div><div class="actions"><button class="btn secondary" type="button" onclick="previousSection()">Back</button><button class="btn primary" type="button" onclick="finishTest()">Calculate my result</button></div>`;
+ form.appendChild(s);
+}
+addFinal();
+const sections=[...form.querySelectorAll(".section")];
+function show(n){
+ sections.forEach(x=>x.classList.remove("active"));
+ sections[n].classList.add("active"); current=n;
+ const pct=Math.round((n/(sections.length-1))*100);
+ document.getElementById("fill").style.width=pct+"%";document.getElementById("progressPct").textContent=pct+"%";
+ document.getElementById("progressLabel").textContent=n===0?"Getting started":n===sections.length-1?"Final questions":`Section ${n} of 10`;
+ window.scrollTo({top:0,behavior:"smooth"});
+}
+function valid(sec){
+ const required=[...sec.querySelectorAll("input[required]")];
+ const names=[...new Set(required.map(x=>x.name))];
+ return names.every(name=>sec.querySelector(`input[name="${name}"]:checked`));
+}
+form.addEventListener("change",e=>{if(e.target.type==="radio"){e.target.closest(".options").querySelectorAll(".opt").forEach(x=>x.classList.remove("selected"));e.target.closest(".opt").classList.add("selected");answers[e.target.name]=+e.target.value;}});
+
+function startTest(){
+  if(!document.getElementById("name").value.trim()){
+    alert("Please enter your name or nickname first.");
+    document.getElementById("name").focus();
+    return;
+  }
+  show(1);
+}
+function nextSection(){
+  const sec=sections[current];
+  if(!valid(sec)){
+    alert("Please answer every question on this page before continuing.");
+    return;
+  }
+  show(current+1);
+}
+function previousSection(){
+  show(Math.max(0,current-1));
+}
+function finishTest(){
+  if(!valid(sections[current])){
+    alert("Please answer both final questions.");
+    return;
+  }
+  calculate();
+}
+async function calculate(){
+ const scores=cats.map((_,i)=>{
+   let sum=0;for(let j=0;j<6;j++)sum+=answers[`c${i}_${j}`]||0;
+   sum+=(answers[`s${i}`]||0)*1.7;
+   const max=6*5+5*1.7;
+   return sum/max*100;
+ });
+ const overall=scores.reduce((a,b)=>a+b,0)/scores.length;
+ const name=document.getElementById("name").value.trim()||"You";
+ let title,text;
+ if(overall>=90){title="Exceptional Alignment";text=`${name}, you naturally seem to offer many of the things I need to feel loved, safe, understood, and chosen.`}
+ else if(overall>=80){title="Very Strong Alignment";text=`${name}, there is a strong natural match between how you approach relationships and what I need from one.`}
+ else if(overall>=70){title="Strong Potential";text=`${name}, there are many things here that could work beautifully, although there are some areas where understanding and communication would matter.`}
+ else if(overall>=60){title="Some Meaningful Differences";text=`${name}, there are some important differences in how we may naturally approach relationships. That doesn't make compatibility impossible, but it means we'd need to understand each other well.`}
+ else{title="Significant Differences";text=`${name}, our natural relationship styles appear quite different. That doesn't make either person wrong, but it could mean some of my needs would require considerable effort or compromise.`}
+ const ranked=scores.map((v,i)=>({name:cats[i][0],v})).sort((a,b)=>b.v-a.v);
+ document.getElementById("overall").textContent=Math.round(overall)+"%";
+ document.getElementById("resultTitle").textContent=title;document.getElementById("resultText").textContent=text;
+ document.getElementById("categories").innerHTML=ranked.map(x=>`<div class="cat"><div class="cathead"><span>${x.name}</span><span>${Math.round(x.v)}%</span></div><div class="mini"><span style="width:${x.v}%"></span></div></div>`).join("");
+ document.getElementById("strongest").innerHTML=ranked.slice(0,3).map(x=>`<p><strong>${x.name}</strong> — ${Math.round(x.v)}%</p>`).join("");
+ document.getElementById("lowest").innerHTML=ranked.slice(-3).reverse().map(x=>`<p><strong>${x.name}</strong> — ${Math.round(x.v)}%</p>`).join("");
+ form.style.display="none";document.querySelector(".progressbox").style.display="none";document.querySelector(".hero").style.display="none";document.getElementById("results").classList.add("active");
+
+ const payload={
+   submittedAt:new Date().toISOString(),
+   name,
+   overall:Math.round(overall*100)/100,
+   resultTitle:title,
+   categories:Object.fromEntries(cats.map((c,i)=>[c[0],Math.round(scores[i]*100)/100])),
+   answers,
+   adminKey:ADMIN_KEY
+ };
+ const status=document.getElementById("submitStatus");
+ status.style.display="block";
+ if(RESULTS_ENDPOINT){
+   status.textContent="Saving your result…";
+   const r=await sendResult(payload);
+   status.textContent=r.ok ? "Your result has been submitted." : "Your result is shown above. Submission could not be confirmed.";
+ } else {
+   status.textContent="Your result is ready. (Online result storage has not been connected yet.)";
+ }
+}
+// Online result storage
+const RESULTS_ENDPOINT = "https://script.google.com/macros/s/AKfycby1E6KJi84ul7ulXDaWRAvNwrpJzF-SjJUl6-imTeAd0k34WwOuZ8E5qE_S6Ltf6Xw-Lw/exec";
+const ADMIN_KEY = "BANANA";
+async function sendResult(payload){
+  if(!RESULTS_ENDPOINT) return {ok:false, skipped:true};
+  try{
+    await fetch(RESULTS_ENDPOINT,{
+      method:"POST",
+      mode:"no-cors",
+      headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body:JSON.stringify(payload)
+    });
+    return {ok:true};
+  }catch(err){ return {ok:false,error:String(err)}; }
+}
+</script>
+</body>
+</html>
